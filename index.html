@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>코타키나바루 원정대 · 칩돌리기</title>
+<meta name="theme-color" content="#0fb6a8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="코타키나바루 원정대">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky1:#ff9d6c; --sky2:#ffd9a0; --grass:#0fb6a8; --grass-d:#0b8b81;
+    --sun:#ffcb3d; --sun-d:#e8a30f;
+    --pink:#ff6f61; --pink-d:#e0503f;
+    --blue:#2bb8d8; --blue-d:#1f8fac;
+    --purple:#8a6fe8; --purple-d:#6a4fc4;
+    --ink:#2a2a3a; --sub:#6b7285;
+    --card:#fffdf8; --card2:#f2fbfa;
+    --red:#ff5c6c;
+    --shadow-ink: rgba(42,42,58,.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;}
+  body{
+    font-family:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:
+      radial-gradient(circle at 85% 6%, #fff1c2 0%, rgba(255,241,194,0) 22%),
+      radial-gradient(circle at 12% 14%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 18%),
+      linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 45%, #fff2d6 100%);
+    color:var(--ink);
+    height:100dvh;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  h1,h2,h3,.toon{font-family:"Jua","Gowun Dodum",sans-serif;}
+  .app{max-width:1500px;margin:0 auto;padding:12px 18px;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+  header.top{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 4px 10px;}
+  header.top h1{font-size:22px;margin:0;color:var(--grass-d);letter-spacing:.5px;
+    text-shadow:2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;}
+  @media (min-width:820px){
+    .app{padding:16px 30px;}
+    header.top h1{font-size:26px;}
+    .tab{font-size:18px;padding:12px 4px;}
+    .card{padding:20px;border-radius:26px;}
+    .card h2{font-size:20px;}
+  }
+  header.top .meta{font-size:14px;color:var(--grass-d);font-weight:700;background:#fff;padding:6px 12px;border-radius:20px;border:2px solid var(--grass);cursor:pointer;}
+
+  .tabs{flex:none;display:flex;gap:8px;background:rgba(255,255,255,.55);padding:6px;border-radius:20px;margin-bottom:10px;border:3px solid #fff;box-shadow:0 3px 0 var(--shadow-ink);}
+  .tab{flex:1;text-align:center;padding:11px 4px;border-radius:14px;color:var(--grass-d);font-size:15px;font-weight:700;cursor:pointer;font-family:"Jua",sans-serif;}
+  .tab.active{background:var(--grass);color:#fff;box-shadow:0 3px 0 var(--grass-d);transform:translateY(-1px);}
+  .panel{display:none;}
+  .panel.active{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+
+  .card{background:var(--card);border-radius:24px;padding:20px;margin-bottom:16px;border:3px solid #fff;box-shadow:0 5px 0 rgba(42,42,58,.10), 0 8px 18px rgba(42,42,58,.10);}
+  .card h2{font-size:19px;margin:0 0 14px;color:var(--grass-d);}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+  .btn{appearance:none;border:none;border-radius:999px;padding:15px 22px;font-size:17px;font-weight:700;cursor:pointer;color:#fff;background:var(--grass);font-family:"Jua",sans-serif;box-shadow:0 4px 0 var(--grass-d);transition:transform .05s;}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--grass-d);}
+  .btn.secondary{background:#fff;color:var(--grass-d);border:2px solid var(--grass);box-shadow:0 4px 0 #cfe8d8;}
+  .btn.danger{background:var(--red);box-shadow:0 4px 0 #c23b4c;}
+  .btn.gold{background:var(--sun);color:#6b4a00;box-shadow:0 4px 0 var(--sun-d);}
+  .btn.small{padding:10px 16px;font-size:14px;}
+  .btn:disabled{opacity:.35;box-shadow:none;transform:none;cursor:default;}
+
+  input[type=text],input[type=number]{border:2px solid var(--card2);border-radius:14px;padding:14px 16px;font-size:17px;width:100%;background:#fff;color:var(--ink);font-family:inherit;}
+  input[type=text]:focus,input[type=number]:focus{outline:none;border-color:var(--blue);}
+
+  .grid-players{display:flex;flex-direction:column;gap:12px;margin-bottom:14px;}
+  .player-row{display:flex;gap:10px;align-items:center;}
+  .player-row input{flex:1;}
+  .swatch{width:30px;height:30px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 0 0 2px var(--ink);}
+
+  .holepicker{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 6px;margin:0;flex:1;}
+  .holepicker::-webkit-scrollbar{display:none;}
+  .hole-chip{flex:none;min-width:44px;height:44px;border-radius:12px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--grass-d);border:2px solid var(--card2);cursor:pointer;position:relative;font-family:"Jua",sans-serif;box-shadow:0 2px 0 #dfe6f5;}
+  .hole-chip small{font-weight:500;font-size:8px;color:var(--sub);}
+  .hole-chip.done{border-color:var(--grass);background:#eafbf1;}
+  .hole-chip.active{background:var(--pink);color:#fff;border-color:var(--pink-d);box-shadow:0 3px 0 var(--pink-d);}
+  .hole-chip.active small{color:#fffdf8;}
+  .hole-chip.settle::after{content:"₩";position:absolute;top:-9px;right:-7px;background:var(--sun);color:#6b4a00;width:24px;height:24px;border-radius:50%;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 0 var(--sun-d);}
+
+  .par-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+
+  .empty-state{text-align:center;color:var(--sub);padding:40px 12px;font-size:16px;}
+  .warn{font-size:14px;color:var(--red);margin-top:10px;font-weight:700;}
+
+  .chip-visual{
+    width:44px;height:44px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:20px;background:repeating-conic-gradient(#fff 0deg 22.5deg, #f1f3fb 22.5deg 45deg);
+    border:4px dashed;box-shadow:0 2px 4px rgba(0,0,0,.2);
+  }
+
+  /* ---- POKER-STYLE MAIN VIEW ---- */
+  .holecounter-row{display:flex;align-items:center;justify-content:center;gap:16px;}
+  .holecounter-row button{width:42px;height:42px;border-radius:50%;border:none;background:var(--card2);font-size:20px;font-weight:800;color:var(--grass-d);cursor:pointer;box-shadow:0 3px 0 #d7dcec;}
+  .holecounter-row .lbl{font-family:"Jua",sans-serif;font-size:17px;}
+  .holecounter-row .num{color:var(--grass-d);}
+  .settle-hint{margin-top:8px;text-align:center;font-size:14px;color:#b3800a;font-weight:700;background:#fffaea;border-radius:14px;padding:8px;}
+
+  .tip-card{display:flex;align-items:flex-start;gap:10px;background:#fffbea;border:3px solid var(--sun);border-radius:20px;padding:14px 16px;margin-bottom:12px;}
+  .tip-card .tip-emoji{font-size:24px;flex:none;}
+  .tip-card .tip-body{flex:1;}
+  .tip-card .tip-title{font-family:"Jua",sans-serif;font-size:15px;color:#8a6a00;margin-bottom:4px;}
+  .tip-card .tip-text{font-size:13px;color:#5c4a10;line-height:1.5;}
+  .tip-card .tip-close{flex:none;background:none;border:none;font-size:16px;color:#b3800a;cursor:pointer;padding:4px;}
+
+  .progress-label{display:flex;justify-content:space-between;font-family:"Jua",sans-serif;font-size:13px;color:var(--grass-d);margin-bottom:4px;}
+  .progress-track{height:8px;background:var(--card2);border-radius:8px;overflow:hidden;margin-bottom:8px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--grass),var(--sun));border-radius:8px;transition:width .2s;}
+
+  .hole-nav-row{display:flex;align-items:center;gap:8px;}
+  .hole-nav-row .round-nav-btn{
+    flex:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--grass);color:#fff;
+    font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 var(--grass-d);
+  }
+  .hole-nav-row .round-nav-btn:disabled{opacity:.35;box-shadow:none;}
+  .settle-hint{margin-top:6px;padding:6px;font-size:12px;}
+
+  .complete-banner{flex:none;background:linear-gradient(135deg,var(--grass),var(--blue));color:#fff;border-radius:18px;padding:10px 16px;text-align:center;font-family:"Jua",sans-serif;font-size:15px;margin-bottom:10px;box-shadow:0 3px 0 rgba(0,0,0,.12);}
+  .complete-banner span{font-size:12px !important;}
+
+  .poker-table{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:min-content;gap:12px;align-content:start;}
+  @media (max-width:900px){
+    .poker-table{grid-template-columns:repeat(2,1fr);}
+  }
+  .seat-card{background:#fff;border-radius:22px;padding:14px 16px;border:3px solid var(--card2);cursor:pointer;box-shadow:0 4px 0 #e2e6f2;transition:transform .05s;display:flex;flex-direction:column;gap:10px;}
+  .seat-card:active{transform:translateY(3px);box-shadow:0 1px 0 #e2e6f2;}
+  .seat-head{display:flex;align-items:center;gap:12px;}
+  .seat-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none;}
+  .seat-name{font-family:"Jua",sans-serif;font-size:18px;flex:1;}
+  .seat-total{font-family:"Jua",sans-serif;font-size:13px;color:#fff;background:var(--grass);border-radius:999px;padding:4px 12px;flex:none;}
+  .seat-stack{display:flex;flex-direction:column;gap:10px;min-height:0;}
+  .seat-group-row{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:start;}
+  .seat-group-row .glabel{font-family:"Jua",sans-serif;font-size:12px;color:var(--sub);padding-top:8px;line-height:1.2;}
+  .seat-group-row .pills-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+  .seat-stack .chip-pill{
+    display:inline-flex;align-items:center;gap:6px;background:#fff;
+    border:2px solid var(--card2);border-left:5px solid var(--pill-color, var(--grass));
+    border-radius:12px;padding:6px 12px 6px 9px;
+    font-family:"Jua",sans-serif;font-size:14px;font-weight:700;color:var(--ink);
+    box-shadow:0 2px 3px rgba(0,0,0,.06);
+  }
+  .seat-stack .chip-pill .ic{font-size:22px;}
+  .seat-empty{color:var(--sub);font-size:15px;}
+
+  /* ---- PLAYER CHIP PICKER SHEET ---- */
+  .picker-zone-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start;}
+  .picker-zone-col-side{display:flex;flex-direction:column;gap:18px;}
+  .picker-zone{background:var(--card2);border-radius:20px;padding:14px 16px;}
+  .picker-zone-title{font-family:"Jua",sans-serif;font-size:16px;margin:0 2px 12px;}
+  .picker-zone-title.ball{color:#2f76d6;}
+  .picker-zone-title.putt{color:#7c4fc4;}
+  .picker-zone-title.score{color:#c23b4c;}
+  .picker-zone-title.praise{color:#b3800a;}
+  .picker-chip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .picker-chip-btn{
+    background:#fff;border:3px solid transparent;border-radius:16px;padding:12px 8px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;text-align:center;
+    font-family:inherit;transition:transform .05s;
+  }
+  .picker-chip-btn:active{transform:translateY(2px);}
+  .picker-chip-btn .chip-visual{width:56px;height:56px;font-size:25px;flex:none;}
+  .picker-chip-btn .pcb-label{font-family:"Jua",sans-serif;font-size:14px;color:var(--ink);line-height:1.2;}
+  .picker-chip-btn{position:relative;}
+  .picker-chip-btn.selected{background:#dff7e6;border-color:#1f9c52;box-shadow:0 0 0 3px rgba(31,156,82,.25);}
+  .picker-chip-btn.selected .pcb-label{color:#1f9c52;font-weight:800;}
+  .pcb-badge{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:#1f9c52;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .pcb-info{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.85);color:var(--sub);font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800;cursor:pointer;}
+
+  .picker-overlay{position:fixed;inset:0;z-index:300;background:rgba(20,30,40,.55);display:none;align-items:stretch;justify-content:center;padding:12px;}
+  .picker-overlay.open{display:flex;}
+  .picker-sheet{
+    background:#fff;border-radius:28px;width:100%;max-width:1100px;height:100%;
+    box-shadow:0 12px 30px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden;
+  }
+  .picker-header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:3px solid var(--card2);}
+  .picker-header-title{flex:1;min-width:0;}
+  .picker-header h3{margin:0;font-family:"Jua",sans-serif;font-size:20px;color:var(--grass-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .picker-header .sub{font-size:12px;color:var(--sub);margin-top:3px;}
+  .picker-header-close{flex:none;width:40px;height:40px;border-radius:50%;background:var(--card2);border:none;font-size:18px;font-weight:800;color:var(--ink);cursor:pointer;}
+  .picker-player-tabs{flex:none;display:flex;gap:10px;padding:10px 18px;border-bottom:3px solid var(--card2);overflow-x:auto;}
+  .picker-player-tabs::-webkit-scrollbar{display:none;}
+  .picker-player-tab{
+    flex:none;display:flex;align-items:center;gap:8px;background:var(--card2);border:3px solid transparent;
+    border-radius:999px;padding:6px 16px 6px 6px;cursor:pointer;font-family:inherit;
+  }
+  .picker-player-tab .ava{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none;}
+  .picker-player-tab .nm{font-family:"Jua",sans-serif;font-size:15px;color:var(--ink);}
+  .picker-player-tab.active{background:#fff;border-color:var(--grass);box-shadow:0 3px 0 #cfe8d8;}
+  .picker-player-tab.active .nm{color:var(--grass-d);}
+  .picker-player-tab .cnt{font-size:12px;color:var(--sub);font-weight:700;}
+  .picker-body{flex:1;min-height:0;overflow-y:auto;padding:18px 22px;}
+  .picker-footer{flex:none;display:flex;gap:12px;padding:10px 22px 16px;border-top:3px solid var(--card2);}
+
+  @media (max-width:700px){
+    .picker-zone-grid{grid-template-columns:1fr;}
+  }
+  .picker-clear-btn{flex:1;background:none;border:2px dashed var(--sub);border-radius:16px;padding:14px;color:var(--sub);font-family:"Jua",sans-serif;font-size:16px;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+  .picker-clear-btn.armed{background:var(--red);border:2px solid var(--red);border-style:solid;color:#fff;}
+  .picker-close{flex:1;background:var(--card2);border:none;border-radius:16px;color:var(--ink);padding:14px;font-family:"Jua",sans-serif;font-size:16px;cursor:pointer;}
+
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:22px;font-family:"Jua",sans-serif;font-size:16px;z-index:400;max-width:88vw;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto;}
+  .toast .toast-msg{flex:1;}
+  .toast .toast-undo{flex:none;background:#fff;color:var(--ink);border:none;border-radius:14px;padding:8px 14px;font-family:"Jua",sans-serif;font-size:14px;cursor:pointer;}
+
+  .chipboard{display:grid;grid-template-columns:1fr;gap:12px;}
+  .chipboard.grid2{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));}
+  .chip-type-card{background:var(--card2);border-radius:20px;padding:15px;}
+  .chip-type-card .head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .chip-type-card .title{font-weight:800;font-size:16px;font-family:"Jua",sans-serif;}
+  .holder-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:20px;padding:7px 14px;font-weight:700;font-size:14px;box-shadow:0 2px 0 #e2e6f2;}
+  .holder-chip .who{color:var(--grass-d);font-weight:800;}
+  .holder-empty{color:var(--sub);font-size:14px;}
+
+  .playerchips{display:flex;flex-direction:column;gap:12px;}
+  .playerchip-row{display:flex;align-items:center;gap:12px;background:var(--card2);border-radius:20px;padding:15px 16px;}
+  .playerchip-row .pname{flex:1;font-weight:800;font-family:"Jua",sans-serif;font-size:17px;}
+  .chipdots{display:flex;gap:5px;flex-wrap:wrap;max-width:180px;}
+  .chipdots .d{width:16px;height:16px;border-radius:5px;}
+  .count{font-weight:800;font-size:19px;min-width:28px;text-align:right;font-family:"Jua",sans-serif;}
+
+  .chippick{display:flex;gap:8px;flex-wrap:wrap;}
+  .holebtn{padding:9px 15px;border-radius:14px;background:var(--card2);font-size:15px;font-weight:800;cursor:pointer;border:2px solid transparent;color:var(--sub);font-family:"Jua",sans-serif;}
+  .holebtn.on{background:var(--grass);color:#fff;border-color:var(--grass-d);}
+
+  .hole-history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+  .hole-history-card{background:#fff;border-radius:22px;padding:14px;border:3px solid var(--card2);box-shadow:0 4px 0 #e2e6f2;}
+  .hole-history-card.done{border-color:var(--grass);background:#f3fff7;}
+  .hh-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .hh-num{font-family:"Jua",sans-serif;font-size:18px;color:var(--grass-d);}
+  .hh-badge{font-family:"Jua",sans-serif;font-size:12px;background:var(--grass);color:#fff;border-radius:999px;padding:4px 10px;}
+  .hh-badge.empty{background:var(--card2);color:var(--sub);}
+  .hh-list{display:flex;flex-direction:column;gap:6px;}
+  .hh-line{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:12px;padding:6px 10px;}
+  .hh-line .hh-label{font-family:"Jua",sans-serif;font-size:13px;flex:none;min-width:56px;}
+  .hh-line .hh-move{font-size:13px;color:var(--ink);font-weight:600;}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border-radius:18px;padding:15px 16px;}
+  .toggle-row span{font-size:16px;}
+  .toggle{width:60px;height:36px;border-radius:20px;background:#dfe3ee;position:relative;cursor:pointer;flex:none;}
+  .toggle.on{background:var(--grass);}
+  .toggle .knob{position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 2px 4px rgba(0,0,0,.25);}
+  .toggle.on .knob{left:27px;}
+
+  #rotatePrompt{
+    display:none;position:fixed;inset:0;z-index:500;
+    background:linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 45%, #fff2d6 100%);
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;
+  }
+  #rotatePrompt .rotate-icon{font-size:64px;display:inline-block;animation:rotateHint 1.6s ease-in-out infinite;}
+  #rotatePrompt .rotate-text{font-family:"Jua",sans-serif;font-size:22px;color:var(--grass-d);margin-top:14px;}
+  #rotatePrompt .rotate-text b{color:var(--pink-d);}
+  #rotatePrompt .rotate-sub{font-size:14px;color:var(--sub);margin-top:8px;}
+  @keyframes rotateHint{
+    0%,100%{transform:rotate(0deg);}
+    50%{transform:rotate(90deg);}
+  }
+  @media (orientation:portrait) and (max-width:900px){
+    #rotatePrompt{display:flex;}
+    .app, .picker-overlay{display:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>🌴 코타키나바루 원정대 · 칩돌리기</h1>
+    <div class="meta" id="headerMeta"></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="game">칩 게임</div>
+    <div class="tab" data-tab="history">히스토리</div>
+    <div class="tab" data-tab="setup">설정</div>
+  </div>
+
+  <!-- GAME TAB -->
+  <div class="panel active" id="panel-game">
+    <div class="card" id="noPlayersCard" style="display:none;">
+      <div class="empty-state">먼저 [설정] 탭에서 플레이어를 등록해주세요.</div>
+    </div>
+    <div id="gameContent" style="display:flex;flex-direction:column;flex:1;min-height:0;gap:12px;"></div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="panel" id="panel-history">
+    <div id="historyContent"></div>
+  </div>
+
+  <!-- SETUP TAB -->
+  <div class="panel" id="panel-setup">
+    <div class="card">
+      <h2>플레이어 (4인 고정)</h2>
+      <div class="grid-players" id="playerList"></div>
+    </div>
+    <div class="card">
+      <h2>홀 수</h2>
+      <select id="holeCountSel">
+        <option value="9">9홀</option>
+        <option value="18" selected>18홀</option>
+      </select>
+    </div>
+    <div class="card">
+      <h2>새 라운드</h2>
+      <div class="row"><button class="btn gold" id="newRoundBtn" style="width:100%;">🔄 새 라운드 시작</button></div>
+      <div class="warn" style="color:var(--sub);font-weight:600;">플레이어 이름은 그대로 두고, 칩 배정과 히스토리만 초기화합니다.</div>
+    </div>
+    <div class="card">
+      <h2>데이터</h2>
+      <div class="row"><button class="btn danger" id="resetAllBtn" style="width:100%;">전체 초기화 (플레이어 이름 포함)</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER CHIP PICKER (full-screen modal) -->
+<div class="picker-overlay" id="pickerOverlay">
+  <div class="picker-sheet">
+    <div class="picker-header">
+      <div class="picker-header-title">
+        <h3 id="pickerTitle">칩 배정</h3>
+        <div class="sub" id="pickerSub"></div>
+      </div>
+      <button class="picker-header-close" id="pickerHeaderCloseBtn">✕</button>
+    </div>
+    <div class="picker-player-tabs" id="pickerPlayerTabs"></div>
+    <div class="picker-body" id="pickerPlayers"></div>
+    <div class="picker-footer">
+      <button class="picker-clear-btn" id="pickerClearBtn">선택 초기화</button>
+      <button class="picker-close" id="pickerCloseBtn">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="rotatePrompt">
+  <div class="rotate-icon">📱</div>
+  <div class="rotate-text">기기를 <b>가로</b>로 돌려주세요</div>
+  <div class="rotate-sub">이 앱은 가로 화면 기준으로 만들어졌어요</div>
+</div>
+
+<script>
+/* ---------- CHIP TYPES (matches physical 16-chip set) ---------- */
+const CHIP_TYPES = [
+  {key:'ob', label:'오비', color:'#4d9dff', emoji:'⛔', tone:'bad', group:'ball'},
+  {key:'hazardMt', label:'해저드(산)', color:'#279056', emoji:'🌿', tone:'bad', group:'ball'},
+  {key:'hazardWater', label:'해저드(물)', color:'#1b3a6b', emoji:'🌊', tone:'bad', group:'ball'},
+  {key:'tree', label:'나무', color:'#7cc576', emoji:'🌳', tone:'bad', group:'ball'},
+  {key:'bunker', label:'벙커', color:'#a3693a', emoji:'⛱️', tone:'bad', group:'ball'},
+  {key:'cart', label:'카트도로', color:'#2a2a3a', emoji:'🛣️', tone:'bad', group:'ball'},
+  {key:'rock', label:'돌', color:'#9aa0a6', emoji:'🪨', tone:'bad', group:'ball'},
+  {key:'neighbor', label:'남의집', color:'#a374e8', emoji:'🏠', tone:'bad', group:'ball'},
+  {key:'putt3', label:'3퍼터', color:'#ffd23f', emoji:'⛳3️⃣', tone:'bad', group:'putt'},
+  {key:'putt4', label:'4퍼터', color:'#e8a90f', emoji:'⛳4️⃣', tone:'bad', group:'putt'},
+  {key:'double', label:'더블(+2)', color:'#ff8fae', emoji:'➕2️⃣', tone:'bad', group:'score'},
+  {key:'triple', label:'트리플(+3↑)', color:'#e35f86', emoji:'💥', tone:'bad', group:'score'},
+  {key:'doublepar', label:'더블파', color:'#ff5c6c', emoji:'❌', tone:'bad', group:'score'},
+  {key:'near', label:'니어', color:'#6b7285', emoji:'📍', tone:'good', group:'praise'},
+  {key:'longest', label:'롱기스트', color:'#e35f86', emoji:'🚀', tone:'good', group:'praise'},
+  {key:'birdie', label:'버디', color:'#e0a72e', emoji:'🐦', tone:'good', group:'praise'},
+];
+const CHIP_MAP = Object.fromEntries(CHIP_TYPES.map(c=>[c.key,c]));
+const CHIP_DESC = {
+  ob:'공이 코스 경계 밖으로 나갔을 때',
+  hazardMt:'산·수풀 등 코스 안 장애구역에 빠졌을 때',
+  hazardWater:'연못 등 워터해저드에 빠졌을 때',
+  tree:'나무를 맞혔을 때',
+  bunker:'모래 벙커에 빠졌을 때',
+  cart:'공이 카트도로에 맞았을 때',
+  rock:'돌·바위에 맞았을 때',
+  neighbor:'다른 홀 페어웨이로 공이 갔을 때',
+  putt3:'한 홀에서 퍼트를 3번 했을 때',
+  putt4:'한 홀에서 퍼트를 4번 이상 했을 때',
+  double:'파보다 2타 많을 때 (더블보기)',
+  triple:'파보다 3타 이상 많을 때',
+  doublepar:'파의 2배 타수를 쳤을 때',
+  near:'니어리스트 핀에 가장 가까이 붙였을 때',
+  longest:'롱기스트 홀에서 가장 멀리 보냈을 때',
+  birdie:'파보다 1타 적을 때'
+};
+const AVATARS = ['🐯','🐻','🐰','🐸','🦊','🐼','🐵','🦁'];
+const CHIP_GROUPS = [
+  {key:'ball', title:'⛳ 볼 사고', cls:'ball'},
+  {key:'putt', title:'🎯 퍼터', cls:'putt'},
+  {key:'score', title:'📉 스코어', cls:'score'},
+  {key:'praise', title:'🎉 칭찬 칩', cls:'praise'},
+];
+
+/* ---------- SOUND EFFECTS (Web Audio, no external files) ---------- */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq, start, dur, type, gainPeak){
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+  gain.gain.setValueAtTime(0, ctx.currentTime + start);
+  gain.gain.linearRampToValueAtTime(gainPeak!=null?gainPeak:0.18, ctx.currentTime + start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + dur + 0.05);
+}
+function playGoodSound(){
+  // cheerful ascending chime
+  playTone(523.25, 0,    0.18, 'triangle');
+  playTone(659.25, 0.09, 0.18, 'triangle');
+  playTone(783.99, 0.18, 0.28, 'triangle');
+}
+function playBadSound(){
+  // comedic descending "womp womp"
+  playTone(300, 0,    0.22, 'sawtooth', 0.14);
+  playTone(220, 0.16, 0.30, 'sawtooth', 0.14);
+}
+
+/* ---------- STATE ---------- */
+const DEFAULT_PLAYER_COLORS = ['#ff5c6c','#4d9dff','#3fc978','#e0a72e','#a374e8','#2a9d8f'];
+const DEFAULT_PLAYER_NAMES = ['하나','경준','재원','비창'];
+let state = loadState();
+// migrate old placeholder names ("플레이어1"..) to the fixed default order
+state.players.forEach((p,i)=>{
+  if(/^플레이어\d$/.test(p.name) && DEFAULT_PLAYER_NAMES[i]) p.name = DEFAULT_PLAYER_NAMES[i];
+});
+saveState();
+let currentPickerPlayer = null;
+
+function defaultState(){
+  return {
+    players: [],
+    holeCount: 18,
+    currentHole: 1,
+    chipHolders: {}, // chipKey -> playerId|null, current holders
+    history: [], // {hole, chipKey, from:pid|null, to:pid|null, time}
+    tutorialSeen: false
+  };
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem('golfChipApp');
+    if(raw){
+      const s = JSON.parse(raw);
+      return Object.assign(defaultState(), s);
+    }
+  }catch(e){}
+  return defaultState();
+}
+function saveState(){ localStorage.setItem('golfChipApp', JSON.stringify(state)); }
+function playerAvatar(idx){ return AVATARS[idx % AVATARS.length]; }
+
+/* ---------- SOUND TRIGGER ---------- */
+function playChipSound(ct){
+  if(ct.tone==='good') playGoodSound(); else playBadSound();
+}
+
+/* ---------- TOAST (with optional undo) ---------- */
+let toastTimer=null;
+let toastUndoFn=null;
+function showToast(msg, undoFn){
+  const t = document.getElementById('toast');
+  toastUndoFn = undoFn || null;
+  t.innerHTML = `<span class="toast-msg">${msg}</span>` + (undoFn ? `<button class="toast-undo" id="toastUndoBtn">되돌리기</button>` : '');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.classList.remove('show'); toastUndoFn=null; }, undoFn ? 4500 : 1800);
+  if(undoFn){
+    document.getElementById('toastUndoBtn').addEventListener('click', e=>{
+      e.stopPropagation();
+      clearTimeout(toastTimer);
+      t.classList.remove('show');
+      const fn = toastUndoFn;
+      toastUndoFn = null;
+      if(fn) fn();
+    });
+  }
+}
+
+/* ---------- TABS ---------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+    renderAll();
+  });
+});
+
+/* ---------- SETUP RENDER ---------- */
+function renderSetup(){
+  const list = document.getElementById('playerList');
+  list.innerHTML = '';
+  state.players.forEach((p,idx)=>{
+    const row = document.createElement('div');
+    row.className='player-row';
+    row.innerHTML = `
+      <div class="swatch" style="background:${p.color}"></div>
+      <input type="text" value="${escapeHtml(p.name)}" data-idx="${idx}" class="pname-input">
+    `;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.pname-input').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      state.players[+e.target.dataset.idx].name = e.target.value;
+      saveState(); renderAll(true);
+    });
+  });
+
+  document.getElementById('holeCountSel').value = state.holeCount;
+}
+document.getElementById('holeCountSel').addEventListener('change', e=>{
+  state.holeCount = +e.target.value;
+  if(state.currentHole > state.holeCount) state.currentHole = state.holeCount;
+  saveState(); renderAll();
+});
+document.getElementById('newRoundBtn').addEventListener('click', ()=>{
+  if(confirm('현재 칩 배정과 히스토리가 모두 초기화됩니다. 새 라운드를 시작할까요?')){
+    state.chipHolders = {};
+    state.history = [];
+    state.currentHole = 1;
+    saveState(); renderAll();
+  }
+});
+document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+  if(confirm('플레이어 이름을 포함한 모든 데이터가 삭제됩니다. 계속할까요?')){
+    state = defaultState();
+    state.players = DEFAULT_PLAYER_COLORS.slice(0,4).map((color,i)=>({id:'p'+(i+1), name:DEFAULT_PLAYER_NAMES[i], color}));
+    saveState(); renderAll();
+  }
+});
+
+/* ---------- GAME TAB (poker-style player view) ---------- */
+function renderGame(){
+  const noP = document.getElementById('noPlayersCard');
+  const content = document.getElementById('gameContent');
+  if(state.players.length===0){
+    noP.style.display='block'; content.innerHTML=''; return;
+  }
+  noP.style.display='none';
+
+  const html = [];
+
+  if(!state.tutorialSeen){
+    html.push(`<div class="tip-card" style="flex:none;">
+      <span class="tip-emoji">👋</span>
+      <div class="tip-body">
+        <div class="tip-title">이렇게 플레이해요!</div>
+        <div class="tip-text">홀마다 사고(오비·해저드 등)나 좋은 샷(버디·니어 등)이 나오면, 해당 플레이어 카드를 탭해서 칩을 배정하세요. 다음 홀로 넘어갈 땐 아래 "다음 홀" 버튼을 누르면 됩니다.</div>
+      </div>
+      <button class="tip-close" id="tipCloseBtn">✕</button>
+    </div>`);
+  }
+
+  const progressPct = Math.round((state.currentHole / state.holeCount) * 100);
+  let hint = '';
+  if(state.currentHole===9 && state.holeCount>9) hint = '⛳ 전반(9홀) 완료! 계속 진행해보세요';
+  else if(state.currentHole>=state.holeCount) hint = '🏁 마지막 홀입니다! 라운드를 마무리해보세요';
+
+  html.push(`<div class="card" style="flex:none;padding:12px 16px;">
+    <div class="progress-label"><span>라운드 진행</span><span>${state.currentHole} / ${state.holeCount} 홀</span></div>
+    <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%;"></div></div>
+    <div class="hole-nav-row">
+      <button class="round-nav-btn" id="roundPrevBtn" ${state.currentHole<=1?'disabled':''}>◀</button>
+      ${renderHolePicker(state.currentHole)}
+      <button class="round-nav-btn" id="roundNextBtn" ${state.currentHole>=state.holeCount?'disabled':''}>▶</button>
+    </div>
+    ${hint ? `<div class="settle-hint">${hint}</div>` : ''}
+  </div>`);
+
+  if(state.currentHole>=state.holeCount){
+    const totalMoves = state.history.length;
+    html.push(`<div class="complete-banner">
+      🏆 라운드 완료!<br><span style="font-size:14px;font-weight:500;">총 ${totalMoves}번의 칩 이동이 있었어요. [히스토리] 탭에서 전체 기록을 확인해보세요.</span>
+    </div>`);
+  }
+
+  html.push(`<div class="poker-table">`);
+  state.players.forEach((p, idx)=>{
+    const mine = CHIP_TYPES.filter(ct=>state.chipHolders[ct.key]===p.id);
+    const stackHtml = mine.length===0
+      ? `<span class="seat-empty">칩 없음, 탭해서 배정</span>`
+      : CHIP_GROUPS.map(group=>{
+          const chips = mine.filter(ct=>ct.group===group.key);
+          if(chips.length===0) return '';
+          return `<div class="seat-group-row">
+            <span class="glabel">${group.title.replace(/^\S+\s/,'')}</span>
+            <div class="pills-wrap">${chips.map(ct=>`<div class="chip-pill" style="--pill-color:${ct.color}"><span class="ic">${ct.emoji}</span>${ct.label}</div>`).join('')}</div>
+          </div>`;
+        }).join('');
+    html.push(`
+      <div class="seat-card" data-pid="${p.id}">
+        <div class="seat-head">
+          <div class="seat-avatar" style="background:${p.color}33;box-shadow:0 0 0 3px ${p.color};">${playerAvatar(idx)}</div>
+          <div class="seat-name">${escapeHtml(p.name)}</div>
+          <div class="seat-total">${mine.length}개</div>
+        </div>
+        <div class="seat-stack">${stackHtml}</div>
+      </div>`);
+  });
+  html.push(`</div>`);
+
+  content.innerHTML = html.join('');
+
+  content.querySelectorAll('.seat-card').forEach(el=>{
+    el.addEventListener('click', ()=> openPlayerPicker(el.dataset.pid));
+  });
+  content.querySelectorAll('.hole-chip').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      state.currentHole = +el.dataset.hole;
+      saveState(); renderGame();
+    });
+  });
+  const prevBtn = document.getElementById('roundPrevBtn');
+  const nextBtn = document.getElementById('roundNextBtn');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{
+    state.currentHole = Math.max(1, state.currentHole-1); saveState(); renderGame();
+  });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{
+    state.currentHole = Math.min(state.holeCount, state.currentHole+1); saveState(); renderGame();
+  });
+  const tipBtn = document.getElementById('tipCloseBtn');
+  if(tipBtn) tipBtn.addEventListener('click', ()=>{
+    state.tutorialSeen = true; saveState(); renderGame();
+  });
+}
+
+function renderHolePicker(activeHole){
+  let html = '<div class="holepicker">';
+  for(let h=1; h<=state.holeCount; h++){
+    const hasHistory = state.history.some(e=>e.hole===h);
+    html += `<div class="hole-chip ${hasHistory?'done':''} ${h===activeHole?'active':''}" data-hole="${h}">
+      ${h}<small>${hasHistory?'✓':'−'}</small>
+    </div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---------- PLAYER CHIP PICKER SHEET ---------- */
+let pendingSelection = new Set();
+
+function openPlayerPicker(pid){
+  currentPickerPlayer = pid;
+  pendingSelection = new Set(CHIP_TYPES.filter(ct=>state.chipHolders[ct.key]===pid).map(ct=>ct.key));
+  renderPickerPlayer();
+}
+
+function renderPickerPlayer(){
+  const pid = currentPickerPlayer;
+  const player = state.players.find(p=>p.id===pid);
+  if(!player) return;
+  document.getElementById('pickerTitle').textContent = `${escapeHtml(player.name)}님 칩 배정`;
+  document.getElementById('pickerSub').textContent = '칩을 탭해서 선택(강조 표시)하고, 하단 "저장"을 눌러야 반영됩니다';
+
+  const tabs = document.getElementById('pickerPlayerTabs');
+  tabs.innerHTML = '';
+  state.players.forEach((p, i)=>{
+    const cnt = CHIP_TYPES.filter(ct=>state.chipHolders[ct.key]===p.id).length;
+    const tab = document.createElement('button');
+    tab.className = 'picker-player-tab' + (p.id===pid ? ' active' : '');
+    tab.innerHTML = `<span class="ava" style="background:${p.color}33;box-shadow:0 0 0 2px ${p.color};">${playerAvatar(i)}</span><span class="nm">${escapeHtml(p.name)}</span><span class="cnt">${cnt}개</span>`;
+    tab.addEventListener('click', ()=>{ if(p.id!==pid) openPlayerPicker(p.id); });
+    tabs.appendChild(tab);
+  });
+
+  function buildZone(group){
+    const zoneDiv = document.createElement('div');
+    zoneDiv.className = 'picker-zone';
+    const grid = document.createElement('div');
+    grid.className = 'picker-chip-grid';
+    CHIP_TYPES.filter(c=>c.group===group.key).forEach(ct=>{
+      const selected = pendingSelection.has(ct.key);
+      const btn = document.createElement('button');
+      btn.className = 'picker-chip-btn' + (selected ? ' selected' : '');
+      btn.innerHTML = `<span class="pcb-info" data-key="${ct.key}">ⓘ</span>${selected ? '<span class="pcb-badge">✓</span>' : ''}<span class="chip-visual" style="border-color:${ct.color}">${ct.emoji}</span><span class="pcb-label">${ct.label}</span>`;
+      btn.querySelector('.pcb-info').addEventListener('click', e=>{
+        e.stopPropagation();
+        showToast(`${ct.emoji} ${ct.label} — ${CHIP_DESC[ct.key]||''}`);
+      });
+      btn.addEventListener('click', ()=>{
+        if(selected){
+          pendingSelection.delete(ct.key);
+        } else {
+          pendingSelection.add(ct.key);
+          playChipSound(ct);
+        }
+        renderPickerPlayer();
+      });
+      grid.appendChild(btn);
+    });
+    zoneDiv.innerHTML = `<div class="picker-zone-title ${group.cls}">${group.title}</div>`;
+    zoneDiv.appendChild(grid);
+    return zoneDiv;
+  }
+
+  const body = document.getElementById('pickerPlayers');
+  body.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'picker-zone-grid';
+  body.appendChild(wrap);
+
+  const mainCol = document.createElement('div');
+  mainCol.className = 'picker-zone-col-main';
+  mainCol.appendChild(buildZone(CHIP_GROUPS.find(g=>g.key==='ball')));
+  wrap.appendChild(mainCol);
+
+  const sideCol = document.createElement('div');
+  sideCol.className = 'picker-zone-col-side';
+  ['putt','score','praise'].forEach(key=>{
+    sideCol.appendChild(buildZone(CHIP_GROUPS.find(g=>g.key===key)));
+  });
+  wrap.appendChild(sideCol);
+
+  document.getElementById('pickerOverlay').classList.add('open');
+}
+
+function discardPicker(){
+  document.getElementById('pickerOverlay').classList.remove('open');
+  currentPickerPlayer = null;
+  pendingSelection = new Set();
+  renderGame();
+}
+document.getElementById('pickerHeaderCloseBtn').addEventListener('click', discardPicker);
+document.getElementById('pickerOverlay').addEventListener('click', e=>{
+  if(e.target.id==='pickerOverlay') discardPicker();
+});
+document.getElementById('pickerClearBtn').addEventListener('click', ()=>{
+  if(!currentPickerPlayer) return;
+  pendingSelection = new Set();
+  renderPickerPlayer();
+});
+document.getElementById('pickerCloseBtn').addEventListener('click', ()=>{
+  const pid = currentPickerPlayer;
+  if(!pid) return;
+  const player = state.players.find(p=>p.id===pid);
+  const before = {};
+  const changed = [];
+  CHIP_TYPES.forEach(ct=>{
+    const wasMine = state.chipHolders[ct.key]===pid;
+    const nowSelected = pendingSelection.has(ct.key);
+    if(wasMine === nowSelected) return;
+    changed.push(ct.key);
+    before[ct.key] = state.chipHolders[ct.key] || null;
+    state.chipHolders[ct.key] = nowSelected ? pid : null;
+    logHistory(ct.key, before[ct.key], state.chipHolders[ct.key]);
+  });
+  saveState();
+  document.getElementById('pickerOverlay').classList.remove('open');
+  currentPickerPlayer = null;
+  pendingSelection = new Set();
+  renderGame(); renderHistory();
+  if(changed.length){
+    showToast(`✅ ${escapeHtml(player.name)}님 칩 ${changed.length}개 저장됨`, ()=>{
+      changed.forEach(key=>{
+        const afterVal = state.chipHolders[key];
+        state.chipHolders[key] = before[key];
+        logHistory(key, afterVal, before[key]);
+      });
+      saveState();
+      renderGame(); renderHistory();
+    });
+  }
+});
+
+/* ---------- HISTORY LOG ---------- */
+function logHistory(chipKey, fromPid, toPid){
+  if(fromPid===toPid) return;
+  state.history.push({hole: state.currentHole, chipKey, from: fromPid, to: toPid, time: Date.now()});
+}
+
+/* ---------- HISTORY TAB (grid of hole cards) ---------- */
+function renderHistory(){
+  const content = document.getElementById('historyContent');
+  if(state.players.length===0){
+    content.innerHTML = `<div class="card"><div class="empty-state">먼저 [설정] 탭에서 플레이어를 등록해주세요.</div></div>`;
+    return;
+  }
+
+  const byHole = {};
+  state.history.forEach(e=>{
+    if(!byHole[e.hole]) byHole[e.hole] = [];
+    byHole[e.hole].push(e);
+  });
+
+  const html = [`<div class="hole-history-grid">`];
+  for(let h=1; h<=state.holeCount; h++){
+    const entries = byHole[h] || [];
+    const done = entries.length > 0;
+    html.push(`<div class="hole-history-card ${done?'done':''}">
+      <div class="hh-head">
+        <span class="hh-num">${h}홀</span>
+        ${done ? `<span class="hh-badge">✓ 완료</span>` : `<span class="hh-badge empty">기록 없음</span>`}
+      </div>`);
+    if(done){
+      html.push(`<div class="hh-list">`);
+      entries.forEach(entry=>{
+        const ct = CHIP_MAP[entry.chipKey];
+        const fromP = state.players.find(p=>p.id===entry.from);
+        const toP = state.players.find(p=>p.id===entry.to);
+        html.push(`<div class="hh-line">
+          <span class="chip-visual" style="width:38px;height:38px;border-width:3px;font-size:17px;border-color:${ct.color}">${ct.emoji}</span>
+          <span class="hh-label">${ct.label}</span>
+          <span class="hh-move">${fromP?escapeHtml(fromP.name):'없음'}→${toP?escapeHtml(toP.name):'없음'}</span>
+        </div>`);
+      });
+      html.push(`</div>`);
+    }
+    html.push(`</div>`);
+  }
+  html.push(`</div>`);
+
+  content.innerHTML = html.join('');
+}
+
+/* ---------- UTIL ---------- */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- RENDER ALL ---------- */
+function renderAll(skipSetup, skipGame){
+  document.getElementById('headerMeta').textContent = state.players.length? `${state.players.length}명 · ${state.holeCount}홀` : '';
+  if(!skipGame) renderGame();
+  renderHistory();
+  if(!skipSetup) renderSetup();
+}
+
+/* ---------- INIT ---------- */
+if(state.players.length===0){
+  state.players = DEFAULT_PLAYER_COLORS.slice(0,4).map((color,i)=>({id:'p'+(i+1), name:DEFAULT_PLAYER_NAMES[i], color}));
+  saveState();
+}
+renderAll();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

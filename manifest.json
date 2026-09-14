@@ -1,0 +1,16 @@
+{
+  "name": "코타키나바루 원정대 · 칩돌리기",
+  "short_name": "원정대",
+  "description": "코타키나바루 골프 여행에서 즐기는 칩돌리기 내기 게임",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#ffd9a0",
+  "theme_color": "#0fb6a8",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
